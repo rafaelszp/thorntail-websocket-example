@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Echo Test</title>
+    <script>
+        function init() {
+            websocket = new WebSocket("ws://localhost:8080/chat");
+
+            websocket.onopen = function() { document.getElementById("output").innerHTML += "<p>> CONNECTED</p>"; };
+
+            websocket.onmessage = function(evt) {
+                msg = JSON.parse(evt.data);
+
+                msg = "<br>Message: "+msg.message+"<br>Sender: "+msg.sender+"<br>Timestamp: "+msg.timestamp;
+
+                document.getElementById("output").innerHTML += "<p style='color: blue;'>> RESPONSE: " + msg + "</p>";
+            };
+
+            websocket.onerror = function(evt) { document.getElementById("output").innerHTML += "<p style='color: red;'>> ERROR: " + evt.data + "</p>"; };
+        }
+
+        function sendMessage(message) {
+            document.getElementById("output").innerHTML += "<p>> SENT: " + message + "</p>";
+
+            msg = {
+                "message": message,
+                "sender": document.getElementsByName("username")[0].value
+            };
+            msg = JSON.stringify(msg);
+            websocket.send(msg);
+        }
+
+        window.addEventListener("load", init, false);
+    </script>
+</head>
+<body>
+<p>Type your name:</p><input type="text"  name="username" value="John Doe"/>
+<p>Type your text and hit enter to send your message</p>
+<input onkeypress="if(this.value) {if (window.event.keyCode == 13) { sendMessage(this.value); this.value = null; }}"/>
+<p>Message log:</p>
+<div id="output"></div>
+</body>
+</html>
+</html>
